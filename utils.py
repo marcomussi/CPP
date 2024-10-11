@@ -31,6 +31,28 @@ def generate_user_ranges(num_users, min_range, max_range, low_to_high_mix=0.5):
     return user_ranges
 
 
+def generate_graph(num_products, num_clusters):
+    """
+    Generates random clusters
+    """
+    
+    trainers = np.random.choice(num_products, num_clusters, replace=False)
+    
+    clusters_dict = {trainers[i] : [] for i in range(len(trainers))}
+
+    to_assign = []
+    for i in range(num_products):
+        if i not in list(clusters_dict.keys()):
+            to_assign.append(i)
+    
+    assignments = np.random.choice(list(clusters_dict.keys()), num_products - num_clusters)
+    
+    for i in range(len(to_assign)):
+        clusters_dict[assignments[i]].append(to_assign[i])
+
+    return clusters_dict
+
+
 def kernel_rbf(a, b, L): 
     """
     Radial Basis Function Kernel 
@@ -44,3 +66,54 @@ def kernel_rbf(a, b, L):
             output[i, j] = np.power(np.linalg.norm(a[i, :] - b[j, :], 2), 2)
     
     return np.exp(- L * output)
+
+
+def incr_inv(A_inv, B, C, D):
+    """
+    Incremental inverse of blockwise matrix [[A, B], [C, D]]
+    We consider only square matrices, no pseudo-inverses
+    """
+
+    n = A_inv.shape[0] # original number of rows/cols
+    n_add = C.shape[0] # number of rows/cols to add
+    
+    assert A_inv.shape == (n, n)
+    assert B.shape == (n, n_add)
+    assert C.shape == (n_add, n)
+    assert D.shape == (n_add, n_add)
+
+    temp = np.linalg.inv(D - C @ A_inv @ B)
+
+    block1 = A_inv + A_inv @ B @ temp @ C @ A_inv
+    block2 = - A_inv @ B @ temp
+    block3 = - temp @ C @ A_inv
+    block4 = temp
+
+    res1 = np.concatenate((block1, block2), axis=1)
+    res2 = np.concatenate((block3, block4), axis=1)
+
+    return np.concatenate((res1, res2), axis=0)
+
+
+def incr_inv_SD(A_inv, B, C, D):
+    if A_inv.size == 0:
+        if D.size == 1:
+            return (1/D).reshape(-1, 1)
+        else:
+            return np.linalg.inv(D)
+    
+    if B.size == 0 or C.size == 0 or D.size == 0:
+        return A_inv
+
+    temp = np.linalg.inv(D - C @ A_inv @ B)
+
+    block1 = A_inv + A_inv @ B @ temp @ C @ A_inv
+    block2 = - A_inv @ B @ temp
+    block3 = - temp @ C @ A_inv
+    block4 = temp
+
+    res1 = np.concatenate((block1, block2), axis=1)
+    res2 = np.concatenate((block3, block4), axis=1)
+    res = np.concatenate((res1, res2), axis=0)
+
+    return res
