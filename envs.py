@@ -54,3 +54,26 @@ class IndependentPricingEnv:
 
 
 
+
+class DeterministicToyEnv:
+    
+    def __init__(self, n_products, n_actions, actions, demands, user_range, seed=0):
+        
+        self.n_products = n_products
+        self.n_actions = n_actions
+        self.demands = demands
+        self.actions = actions
+        self.user_range = user_range
+        
+    
+    def step(self, action):
+        
+        assert action.ndim == 1 and action.shape[0] == self.n_products, "error in action"
+        sales = np.zeros((self.n_products, 2), dtype=int)
+        sales[:, 1] = 1000
+        sales[:, 0] = np.round(sales[:, 1] * np.array([self.demands[i, action[i]] for i in range(self.n_products)]))
+        return sales
+
+
+    def compute_optimal_actions(self):
+        return np.argmax(np.multiply(self.demands, self.actions), axis=1), np.max(np.multiply(self.demands, self.actions), axis=1)

@@ -102,7 +102,7 @@ class DoubleGaussianProcessRegressor:
             self.x_vect = np.vstack((self.x_vect, np.array([x]).reshape(1, self.input_dim)))
             self.y1_vect = np.vstack((self.y1_vect, np.array([y1]).reshape(1, 1)))
             self.y2_vect = np.vstack((self.y2_vect, np.array([y2]).reshape(1, 1)))
-
+            
             self.K_matrix_inv = incr_inv(
                 self.K_matrix_inv, 
                 new_K.reshape(-1, 1), 
