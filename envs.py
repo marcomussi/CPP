@@ -171,6 +171,21 @@ class ComplementaryPricingEnv:
         
         return optimal_actions, optimal_value
 
+    
+    def compute_optimum_indep(self):
+        
+        optimal_actions = -1 * np.ones(self.n_products, dtype=int)
+        optimal_value = 0
+        
+        for key in list(np.linspace(0, self.n_products - 1, self.n_products, dtype=int)):
+
+            map_idx, value = self._montecarlo_simulation(key, [])
+            
+            optimal_value += value
+            optimal_actions[key] = self.byvariate_actions_map[map_idx, 0]
+        
+        return optimal_actions, optimal_value
+
 
     def _montecarlo_simulation(self, leader, follower_lst):
         

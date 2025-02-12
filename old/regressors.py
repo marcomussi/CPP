@@ -7,10 +7,10 @@ from utils import kernel_rbf
 class GaussianProcessRegressor: 
 
     
-    def __init__(self, kernel_L, sigma_process, input_dim):
+    def __init__(self, kernel_L, sigma_sq_process, input_dim):
         
         self.kernel_L = kernel_L
-        self.sigma_process = sigma_process  
+        self.sigma_sq_process = sigma_sq_process
         self.input_dim = input_dim
         self.x_vect = None
         self.y_vect = None
@@ -43,7 +43,7 @@ class GaussianProcessRegressor:
         
         n = x.shape[0]
         
-        K = kernel_rbf(self.x_vect, self.x_vect, self.kernel_L) + self.sigma_process * np.eye(self.y_vect.shape[0])
+        K = kernel_rbf(self.x_vect, self.x_vect, self.kernel_L) + self.sigma_sq_process * np.eye(self.y_vect.shape[0])
         K_inv = np.linalg.inv(K)
         
         mu = np.zeros(n)
@@ -63,10 +63,10 @@ class GaussianProcessRegressor:
 class DoubleGaussianProcessRegressor: 
 
     
-    def __init__(self, kernel_L, sigma_process, input_dim):
+    def __init__(self, kernel_L, sigma_sq_process, input_dim):
         
         self.kernel_L = kernel_L
-        self.sigma_process = sigma_process  
+        self.sigma_sq_process = sigma_sq_process  
         self.input_dim = input_dim
         self.x_vect = None
         self.y1_vect = None
@@ -103,7 +103,7 @@ class DoubleGaussianProcessRegressor:
         
         n = x.shape[0]
         
-        K = kernel_rbf(self.x_vect, self.x_vect, self.kernel_L) + self.sigma_process * np.eye(self.y1_vect.shape[0])
+        K = kernel_rbf(self.x_vect, self.x_vect, self.kernel_L) + self.sigma_sq_process * np.eye(self.y1_vect.shape[0])
         K_inv = np.linalg.inv(K)
         
         y1_mu = np.zeros(n)
