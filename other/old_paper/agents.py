@@ -15,7 +15,6 @@ class PricingAgentIndependent:
         self.beta = 2 * np.log(self.horizon)
         self.no_data = True
 
-    
     def pull(self):
 
         if not self.no_data:
